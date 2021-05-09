@@ -63,8 +63,9 @@ def getListOfPlayers(letter):
             #skip because just headings
         else:
             children = table_row.find_all('a')
+            position = table_row.find_all('td')
             if table_row.find('td').text != 'No active players.':
-                player_info = (children[0].text , children[1].text)
+                player_info = (children[0].text , children[1].text , position[2].text)
                 players.append(player_info)   
         
         
@@ -121,16 +122,21 @@ def getFileDate():
 def pretty_print(complete_colleges_list , college , ratings):
     colorama.init()
     for player in complete_colleges_list[college]:
-        print(Fore.BLUE,'-'*60,Style.RESET_ALL)
+        print(Fore.BLUE,'-'*80,Style.RESET_ALL)
         #create scraper to determine if relevant player, rating > 80
         try:
             if ratings[player[0]] > 80:
-                print(Style.BRIGHT, Fore.RED,'\t',player[0],' | ',player[1],
-                      '[',ratings[player[0]],']', Style.RESET_ALL)
+                print(Style.BRIGHT, Fore.RED,' '*2,player[0],
+                                      ' '*(20-len(player[0])),' | '
+                                      ,player[1],' '*(20-len(player[1])),' | '
+                                      ,player[2],'[',ratings[player[0]],']'
+                                      , Style.RESET_ALL)
             else:
-                print('\t',player[0],' | ',player[1])
+                print(' '*4,player[0], ' '*(20-len(player[0])),
+                      ' | ',player[1], ' '*(20-len(player[1])),' | ',player[2])
         except:
-            print('\t',player[0],' | ',player[1])
+            print(' '*4,player[0], ' '*(20-len(player[0])),
+                      ' | ',player[1], ' '*(20-len(player[1])),' | ',player[2])
 
 def main():
     getFileDate()
