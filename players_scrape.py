@@ -29,6 +29,8 @@ import re
 import string
 import sys
 import json
+import pathlib
+import datetime
 import colorama
 from colorama import Fore
 from colorama import Style
@@ -107,6 +109,13 @@ def getRatings():
             if player[1] not in ratings:
                 ratings[player[1]] = int(player[5])
     return ratings
+
+def getFileDate():
+    fname = pathlib.Path('players.json')
+    if not fname.exists():
+        return
+    last_update = datetime.datetime.fromtimestamp(fname.stat().st_mtime)
+    print('Last update :',last_update.strftime("%b %d %Y"))
         
 
 def pretty_print(complete_colleges_list , college , ratings):
@@ -124,7 +133,7 @@ def pretty_print(complete_colleges_list , college , ratings):
             print('\t',player[0],' | ',player[1])
 
 def main():
-    
+    getFileDate()
     #update player data user decision
     if input('Update (y/n) ? ').lower() == 'y':
         print('Updating player data...')
