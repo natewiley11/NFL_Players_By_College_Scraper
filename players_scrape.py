@@ -1,11 +1,34 @@
 #!/usr/bin/env python3
 
+#author : Nathaniel Wiley
+
+'''
+    *********************************
+        RUN FROM TERMINAL OR CMD
+    *********************************
+'''
+
+from __future__ import print_function
+import sys
+import subprocess
+import pkg_resources
+
+
+#install missing libraries
+required = {'bs4' , 'colorama'}
+installed = {pkg.key for pkg in pkg_resources.working_set}
+missing = required - installed
+
+if missing:
+    python = sys.executable
+    subprocess.check_call([python, '-m', 'pip', 'install', *missing], stdout=subprocess.DEVNULL)
+
 import bs4 as bs
 import urllib.request
-import requests
 import re
 import string
 import sys
+import json
 import colorama
 from colorama import Fore
 from colorama import Style
@@ -52,9 +75,31 @@ def getListOfPlayers(letter):
             players = []
     return colleges
 
+def updatePlayers():
+    alphabet = list(string.ascii_lowercase)
+    complete_colleges_list = {}
+    print('Loading...')
+    for letter in alphabet:
+        letter_data = getListOfPlayers(letter)
+        for college in letter_data:
+            #moving individual letter data to the grand dict
+            complete_colleges_list[college] = letter_data[college]
+            
+    with open("players.json", "w") as outfile: 
+        json.dump(complete_colleges_list, outfile)
+
+def getPlayers():
+    players_json_file = open('players.json')
+    complete_colleges_list = json.load(players_json_file)
+    players_json_file.close()
+
+    return complete_colleges_list
+    
 def getRatings():
     with open('allRatingsFinal.csv', 'r') as data:
         ratings = {}
+
+        #removing duplicate ratings for the same player
         for row in data:
             player = row.split(',')
             if player[5] == 'ovr':
@@ -79,15 +124,22 @@ def pretty_print(complete_colleges_list , college , ratings):
             print('\t',player[0],' | ',player[1])
 
 def main():
-    alphabet = list(string.ascii_lowercase)
-    complete_colleges_list = {}
+    
+    #update player data user decision
+    if input('Update (y/n) ? ').lower() == 'y':
+        print('Updating player data...')
+        updatePlayers()
+        
+    #get player data from json file
+    try:
+        complete_colleges_list = getPlayers()
+    except:
+        print('Run update players function before trying to access data')
+
+    #get Madden 21 final ratings data from csv file
     ratings = getRatings()
-    print('Loading...')
-    for letter in alphabet:
-        letter_data = getListOfPlayers(letter)
-        for college in letter_data:
-            #moving individual letter data to the grand dict
-            complete_colleges_list[college] = letter_data[college]
+
+    #main loop 
     while True:
         college = input('\nCollege (q to quit) : ')
         if college in complete_colleges_list:
