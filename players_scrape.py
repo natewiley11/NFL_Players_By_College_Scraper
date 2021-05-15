@@ -34,6 +34,7 @@ import datetime
 import colorama
 from colorama import Fore
 from colorama import Style
+from addingPlayersFunc import addPlayersFromCollege
 
 def getListOfPlayers(letter):
     if letter == 'a':
@@ -117,12 +118,12 @@ def getFileDate():
         return
     last_update = datetime.datetime.fromtimestamp(fname.stat().st_mtime)
     print('Last update :',last_update.strftime("%b %d %Y"))
-        
+
 
 def pretty_print(complete_colleges_list , college , ratings):
     colorama.init()
     for player in complete_colleges_list[college]:
-        print(Fore.BLUE,'-'*80,Style.RESET_ALL)
+        print(Fore.BLUE,'-'*78,Style.RESET_ALL)
         #create scraper to determine if relevant player, rating > 80
         try:
             if ratings[player[0]] > 80:
@@ -154,6 +155,11 @@ def main():
     #get Madden 21 final ratings data from csv file
     ratings = getRatings()
 
+    team ={}
+    for t in complete_colleges_list:
+        team = addPlayersFromCollege(complete_colleges_list, t, team, ratings)
+    for i in sorted (team.keys()) : 
+        print(i,team[i])
     #main loop 
     while True:
         college = input('\nCollege (q to quit) : ')
